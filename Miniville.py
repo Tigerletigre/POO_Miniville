@@ -55,7 +55,54 @@ class joueur:
   def ajouter_monument(self,monument):
     self._monuments.append(monument)
 
+from random import randint
+class partie:
+  def __init__(self,joueurs):
+    self._joueurs=joueurs
+    self._tour=0
+    self._joueur_actif=joueurs[0]
+  @property
+  def joueurs(self):
+    return self._joueurs
+  @property
+  def tour(self):
+    return self._tour
+  @property
+  def joueur_actif(self):
+    return self._joueur_actif
 
+  def autres_joueurs(self):
+    return [joueur for joueur in self._joueurs if joueur!=self._joueur_actif]
+  
+  def gagnant(self):
+    for joueur in self._joueurs:
+      if joueur.a_gagne():
+        return joueur
+    return None
+  
+  def lancer(self):
+    if self._joueur_actif.a_2_des():
+      a,b=randint(1,6),randint(1,6)
+      if a==b and self._joueur_actif.relance_si_double():
+        return a+b,True
+      else:
+        return a+b,False
+    else:
+      return randint(1,6),False
+
+  def resolution_lancer(self):
+    n,relance=self.lancer()
+
+    #resolution cartes rouges
+    for joueur in self.autres_joueurs:
+      for etab in joueur.etablissements:
+        if etab.couleur=="Rouge" and n in numeros: 
+    pass
+    
+  
+  
+  
+  
 
 from abc import ABC, abstractmethod
 class Carte(ABC):
