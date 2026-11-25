@@ -11,14 +11,13 @@ class joueur:
   def etablissements(self):
     return self._etablissements
 
-  def recevoir(self,n):
+  def recevoir(self,n): #n est arbitraire
     self._argent+=n
-  def payer(self,n):
-    if self._argent<n:
-      raise ValueError("Pas assez d'argent")
-      #la faudra voir comment mettre autre chose psq c'est bizarre de mettre une errorvalue genre si tout le jeu crash c'est chiant quoi
-    else:
-      self._argent-=n
+    
+  def payer(self,n):    #si on a pas assez d'argent on donne ce qu'il nous reste
+      paye = min(n,self._argent)
+      self._argent -= paye
+      return paye
 
   def ajouter_etablissement(self,etablissement):
     self._etablissements.append(etablissement)
@@ -27,31 +26,21 @@ class joueur:
   def possede_etablissement(self,etablissement):
     return etablissement in self._etablissements
 
-  def a_gagne(self):
-    if len(self._monuments)==4:
-      return True
-    else:
-      return False
-  def a_2_des(self):
-    if "Gare" in self._monuments:
-      return True
-    else:
-      return False
-  def peut_relancer(self):
-    if "Tour radio" in self._monuments:
-      return True
-    else:
-      return False
-  def relance_si_double(self):
-    if "Parc d'atractions" in self._monuments:
-      return True
-    else:
-      return False
-  def gain_augmente(self):
-    if "Centre commercial" in self._monuments:
-      return True
-    else:
-      return False
+  def a_gagne(self)->bool:
+      return len(self._monuments)==4
+          
+  def a_2_des(self)->bool:
+      return "Gare" in self._monuments
+  
+  def peut_relancer(self)->bool:
+      return "Tour radio" in self._monuments
+      
+  def relance_si_double(self)->bool:
+      return "Parc d'atractions" in self._monuments
+ 
+  def gain_augmente(self)->bool:
+      return "Centre commercial" in self._monuments
+  
   def ajouter_monument(self,monument):
     self._monuments.append(monument)
 
@@ -191,8 +180,8 @@ class Etab_perte_lanceur(etablissement):
     bonus=0
     if joueur_actif.gain_augmente():
       bonus=1
-    joueur_actif.recevoir(self._montant+bonus)
-    proprio.payer(self._montant+bonus)
+    paye = joueur_actif.payer(self._montant+bonus)
+    proprio.recevoir(paye)
 
 class Stade(etablissement):
     def __init__(self):
