@@ -194,6 +194,32 @@ class CentreAffaires(etablissement):
 
 class ChaineTele(etablissement):
   pass# -*- coding: utf-8 -*-
+
+
+
+
+#carte verte
+class Superette(Etab_gain):
+  def __init__(self):
+    super().__init__('Superette',2,'pain','vert',[4],1)
+
+class Boulangerie(Etab_gain):
+  def __init__(self):
+    super().__init__('Boulangerie',1,'pain','vert',[2,3],3,)
+
+class Fromagerie(Etab_gain_par_cat):
+  def __init__(self):
+    super().__init__('Fromagerie',5,'usine','vert',[7],3,'cochon')
+    
+class Fabrique_de_meubles(Etab_gain_par_cat):
+  def __init__(self):
+    super().__init__('Fabrique_de_meubles',3,'usine','vert',[8],3,'rouage')
+    
+class Marche_de_fruit_et_legumes(Etab_gain_par_cat):
+  def __init__(self):
+    super().__init__('Marche_de_fruit_et_legumes',2,'fruit','vert',[11,12],2,'ble')
+        
+
 """
 Created on Mon Nov  9 10:28:56 2026
 
