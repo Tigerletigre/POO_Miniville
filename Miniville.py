@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-Created on Fri Nov 27 13:11:23 2026
+Created on Fri Nov 27 14:54:28 2026
 
-@author: louis
+@author: Raphael
 """
 
 from abc import ABC, abstractmethod
@@ -40,7 +40,7 @@ class monument(Carte):
 
 class etablissement(Carte):
   def __init__(self,nom,cout,categorie,couleur,numeros):
-    super().__init__()
+    super().__init__(nom,cout)
     self._categorie=categorie
     self._couleur=couleur
     self._numeros=numeros
@@ -56,8 +56,8 @@ class etablissement(Carte):
     return self._numeros
 
   def peut_activer(self, proprio, lanceur):
-        match self._couleur:
-            case "Bleu":
+      match self._couleur:
+        case "Bleu":
               return True
             case "Vert":
               return proprio==lanceur
@@ -135,7 +135,9 @@ class ChaineTele(etablissement):
 
 #je sais pas ce que vous en penser il reste a ajouter toutes les cartes dans le
 #plateau et de changer la fonction acheter dans la classe joueur
+
 class plateau:
+
   _cartes_possible={'Superette','Boulangerie'}
   def __init__(self):
     self._liste_cartes={"Superette": [Etab_gain('Superette', 2, 'pain', 'vert', [4], 1) for _ in range(6)],
@@ -150,8 +152,21 @@ class plateau:
   def retirer_carte_plateau(self,nom):
     self._liste_cartes[nom].pop()
 
+  def pas_assez_d_argent(self,nom,argent):
+    if self._liste_cartes[nom][0].cout>argent:
+      return 1 
+    else:
+      return 0
+    
+  def cout_carte(self,nom):
+    return self._liste_cartes[nom][0].cout
+
+  def acheter_carte(self,nom,joueur):
+    carte=self.liste_cartes[nom].pop()
+    joueur.ajouter_etablissement(cartes)
+
 Superette=Etab_gain('Superette',2,'pain','vert',[4],1)
-dicoetab={Superette:0,}
+
 
 class joueur:
   def __init__(self,nom):
@@ -173,6 +188,16 @@ class joueur:
       paye = min(n,self._argent)
       self._argent -= paye
       return paye
+
+  def acheter_monument(self,nom):
+  if plateau.ecriture_carte(nom):
+    return ValueError('le nom de la carte n est pas reconnu')
+  if plateau.quantite_carte(nom):
+    return ValueError('il n y a plus assez de carte {nom}')
+  if plateau.pas_assez_d_argent(nom,self._argent):
+    return ValueError('pas assez d argent pour acheter {nom}')
+  payer(plateau.cout_carte(nom)) 
+  plateau.acheter_carte(nom,self)
 
   def acheter(self):
     pass
@@ -245,7 +270,7 @@ class partie:
     #double est un booleen
     return sum(des),double
 
-  
+
   def resolution_lancer(self):
     n,relance=self.lancer()
     #boucle anti horraire
@@ -257,4 +282,3 @@ class partie:
       for etab in joueur.etablissements:
         if etab.peut_activer(self._joueur_actif,joueur) and n in etab.numeros:
           etab.activer(joueur,self._joueur_actif)
-
