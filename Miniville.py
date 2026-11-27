@@ -55,8 +55,8 @@ class etablissement(Carte):
   def numeros(self):
     return self._numeros
 
-  def peut_activer(self, proprio, lanceur):
-      match self._couleur:
+  '''def peut_activer(self, proprio, lanceur):
+    match 100:
         case "Bleu":
               return True
             case "Vert":
@@ -73,7 +73,7 @@ class etablissement(Carte):
   @abstractmethod
   def activer(self,proprio,joueur_actif,joueurs):
     pass
-
+'''
 #du coup la j'ai commencé a faires les sous classes dont je parlais redites moi si vous trouvez ça nul c'est ok
 #et j'ai pas fini les cartes violettes psq jpense il manque une classe partie ou un truc qui réunit tout les joueurs qui jouent
 
@@ -124,7 +124,7 @@ class CentreAffaires(etablissement):
     super().__init__("Centre des affaires",6,[6],"Violet","tdt")
 
 
-class ChaineTele(etablissement):
+'''class ChaineTele(etablissement):
   def __init__(self,nom,cout,categorie,couleur,numeros,montant):
     super().__init__("Chaine de télé",6,[6],"Violet","tdt")
   def activer(self, proprio, joueur_actif,joueurs):
@@ -132,7 +132,7 @@ class ChaineTele(etablissement):
       joueur=input("A quel joueur voulez vous prendre de l'argent")
     paye=joueur.payer(self._montant)
     proprio.recevoir(paye)
-
+'''
 #je sais pas ce que vous en penser il reste a ajouter toutes les cartes dans le
 #plateau et de changer la fonction acheter dans la classe joueur
 
@@ -147,10 +147,19 @@ class plateau:
     return 0 if nom in plateau._cartes_possible else 1
 
   def quantite_carte(self,nom):
-    return 0 if nom in self._liste_cartes else 1
+    if len(self._liste_cartes[nom])==0:
+        return 1
+    else: return 0
+
 
   def retirer_carte_plateau(self,nom):
     self._liste_cartes[nom].pop()
+    
+  def carte_restante(self):
+    resultat = {}
+    for nom, cartes in self._liste_cartes.items():
+        resultat[nom] = len(cartes)
+    return resultat
 
   def pas_assez_d_argent(self,nom,argent):
     if self._liste_cartes[nom][0].cout>argent:
@@ -162,8 +171,8 @@ class plateau:
     return self._liste_cartes[nom][0].cout
 
   def acheter_carte(self,nom,joueur):
-    carte=self.liste_cartes[nom].pop()
-    joueur.ajouter_etablissement(cartes)
+    carte=self._liste_cartes[nom].pop()
+    joueur.ajouter_etablissement(carte)
 
 Superette=Etab_gain('Superette',2,'pain','vert',[4],1)
 
@@ -174,12 +183,17 @@ class joueur:
     self._etablissements=[]
     self._argent=3
     self._monuments=[]
+  
   @property
   def nom(self):
     return self._nom
-  @property
+
   def etablissements(self):
-    return self._etablissements
+      for i in range (len(self._etablissements)):
+          print(self._etablissements[i].nom)
+
+  def argent(self):
+    return self._argent
 
   def recevoir(self,n): #n est arbitraire
     self._argent+=n
@@ -189,15 +203,16 @@ class joueur:
       self._argent -= paye
       return paye
 
-  def acheter_monument(self,nom):
-  if plateau.ecriture_carte(nom):
-    return ValueError('le nom de la carte n est pas reconnu')
-  if plateau.quantite_carte(nom):
-    return ValueError('il n y a plus assez de carte {nom}')
-  if plateau.pas_assez_d_argent(nom,self._argent):
-    return ValueError('pas assez d argent pour acheter {nom}')
-  payer(plateau.cout_carte(nom)) 
-  plateau.acheter_carte(nom,self)
+  def acheter_monument(self,nom,plateau):
+    if plateau.ecriture_carte(nom):
+        return ValueError('le nom de la carte n est pas reconnu')
+    if plateau.quantite_carte(nom):
+        return ValueError(f'il n y a plus assez de carte {nom}')
+    if plateau.pas_assez_d_argent(nom,self._argent):
+        return ValueError(f'pas assez d argent pour acheter {nom}')
+    n=plateau.cout_carte(nom)
+    self.payer(n) 
+    plateau.acheter_carte(nom,self)
 
   def acheter(self):
     pass
@@ -229,7 +244,7 @@ class joueur:
 
 from random import randint
 class partie:
-  def __init__(self,joueurs:list[joueur]):
+  def __init__(self,joueurs):
     self._joueurs=joueurs
     self._tour=0
     self._joueur_actif=joueurs[0]
@@ -252,7 +267,7 @@ class partie:
         return joueur
     return None
 
-  def lancer(self)->tuple[int,bool]:
+  def lancer(self):
     nb_des = 1
     #Première conditions pour la gare
     if self._joueur_actif.a_2_des() and demander_oui_non("Voulez vous lancer les 2 dés ?"):
@@ -282,3 +297,13 @@ class partie:
       for etab in joueur.etablissements:
         if etab.peut_activer(self._joueur_actif,joueur) and n in etab.numeros:
           etab.activer(joueur,self._joueur_actif)
+          
+          
+moi=joueur('jp')
+moi.recevoir(10)
+moi.argent()
+moi.etablissements()
+plateau=plateau()
+moi.acheter_monument('Boulangerie',plateau)
+plateau.cout_carte('Boulangerie')
+plateau.carte_restante()
